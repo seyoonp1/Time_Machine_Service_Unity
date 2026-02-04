@@ -1,91 +1,166 @@
-using UnityEngine;
-using UnityEngine.UI;
-using TMPro;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.InputSystem; // ⭐ Input System 필수
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+public enum DialogueState
+{
+    Idle,
+    Typing,
+    WaitingForAdvance,
+    Closed
+}
 
 public class DialogueManager : MonoBehaviour
 {
     public static DialogueManager Instance;
 
     [Header("UI Components")]
-    public GameObject dialoguePanel; 
-    public TextMeshProUGUI nameText; 
+    public GameObject dialoguePanel;
+    public TextMeshProUGUI nameText;
     public TextMeshProUGUI dialogueText;
-    public Image portraitImage; // (초상화 기능 사용 시)
+    public Image portraitImage;
 
     [Header("Settings")]
     public float typingSpeed = 0.05f;
+    public TMP_FontAsset dialogueFontAsset;
 
-    private Queue<string> sentences;
-    private bool isTyping = false; 
-    private string currentSentence; 
+    [Header("Pixel Theme")]
+    public bool applyPixelThemeOnStart = true;
+    public Color panelTint = new Color32(22, 27, 40, 235);
+    public Color nameTint = new Color32(255, 226, 148, 255);
+    public Color dialogueTint = new Color32(245, 248, 255, 255);
+    public int nameFontSize = 30;
+    public int dialogueFontSize = 26;
+    public float dialogueCharacterSpacing = 1.5f;
+    [Range(0f, 1f)] public float textOutlineWidth = 0.22f;
+    public Color textOutlineColor = new Color32(12, 16, 24, 255);
 
-    void Awake()
+    public DialogueState CurrentState { get; private set; } = DialogueState.Idle;
+    public bool IsDialogueOpen => CurrentState != DialogueState.Idle && CurrentState != DialogueState.Closed;
+
+    private readonly Queue<string> sentences = new Queue<string>();
+    private string currentSentence = string.Empty;
+    private Coroutine typingCoroutine;
+
+    private void Awake()
     {
-        if (Instance == null) Instance = this;
-        sentences = new Queue<string>();
-    }
-
-    void Start()
-    {
-        // 시작할 때 무조건 끄기
-        if (dialoguePanel != null) dialoguePanel.SetActive(false);
-    }
-
-    // ⭐ [추가됨] 매 프레임 입력을 감시합니다.
-    void Update()
-    {
-        // 1. 대화창이 꺼져있으면 아무것도 안 함
-        if (dialoguePanel == null || !dialoguePanel.activeSelf) return;
-
-        // 2. 스페이스바 입력 감지 (Input System)
-        if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
+        if (Instance == null)
         {
-            DisplayNextSentence();
+            Instance = this;
         }
-        
-        // (선택사항) F키나 엔터키도 같이 쓰고 싶다면?
-        // if (Keyboard.current.enterKey.wasPressedThisFrame || Keyboard.current.fKey.wasPressedThisFrame)
-        // {
-        //     DisplayNextSentence();
-        // }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
     }
 
-    public void StartDialogue(string name, string[] lines, Sprite portrait = null)
+    private void Start()
     {
-        dialoguePanel.SetActive(true);
-        nameText.text = name;
+        if (applyPixelThemeOnStart)
+        {
+            ApplyPixelTheme();
+        }
 
-        // 초상화 처리
+        if (dialoguePanel != null)
+        {
+            dialoguePanel.SetActive(false);
+        }
+
+        CurrentState = DialogueState.Idle;
+    }
+
+    public void StartDialogue(string speakerName, string[] lines, Sprite portrait = null)
+    {
+        if (!ValidateUiBindings())
+        {
+            EndDialogue();
+            return;
+        }
+
+        dialoguePanel.SetActive(true);
+        nameText.text = speakerName ?? string.Empty;
+
         if (portraitImage != null)
         {
             portraitImage.gameObject.SetActive(portrait != null);
             portraitImage.sprite = portrait;
         }
-        
+
         sentences.Clear();
-        foreach (string line in lines)
+        if (lines != null)
         {
-            sentences.Enqueue(line);
+            foreach (string line in lines)
+            {
+                sentences.Enqueue(line ?? string.Empty);
+            }
         }
 
-        DisplayNextSentence();
+        if (sentences.Count == 0)
+        {
+            sentences.Enqueue("...");
+        }
+
+        ShowNextSentenceFromQueue();
+    }
+
+    public void RequestAdvance()
+    {
+        if (!IsDialogueOpen)
+        {
+            return;
+        }
+
+        if (CurrentState == DialogueState.Typing)
+        {
+            CompleteTypingImmediately();
+            return;
+        }
+
+        if (CurrentState == DialogueState.WaitingForAdvance)
+        {
+            ShowNextSentenceFromQueue();
+        }
     }
 
     public void DisplayNextSentence()
     {
-        // 타이핑 중이면 즉시 완성 (스킵 기능)
-        if (isTyping)
+        RequestAdvance();
+    }
+
+    public void ApplyPixelTheme()
+    {
+        if (dialoguePanel != null)
         {
-            StopAllCoroutines();
-            dialogueText.text = currentSentence;
-            isTyping = false;
-            return;
+            Image panelImage = dialoguePanel.GetComponent<Image>();
+            if (panelImage != null)
+            {
+                panelImage.color = panelTint;
+                if (panelImage.sprite != null)
+                {
+                    panelImage.type = Image.Type.Sliced;
+                }
+            }
+
+            Outline panelOutline = dialoguePanel.GetComponent<Outline>();
+            if (panelOutline == null)
+            {
+                panelOutline = dialoguePanel.AddComponent<Outline>();
+            }
+
+            panelOutline.effectColor = new Color32(8, 10, 16, 255);
+            panelOutline.effectDistance = new Vector2(2f, -2f);
+            panelOutline.useGraphicAlpha = false;
         }
 
-        // 문장이 없으면 종료
+        ConfigurePixelText(nameText, nameTint, nameFontSize, 0f, FontStyles.Bold);
+        ConfigurePixelText(dialogueText, dialogueTint, dialogueFontSize, dialogueCharacterSpacing, FontStyles.Normal);
+    }
+
+    private void ShowNextSentenceFromQueue()
+    {
         if (sentences.Count == 0)
         {
             EndDialogue();
@@ -93,26 +168,116 @@ public class DialogueManager : MonoBehaviour
         }
 
         currentSentence = sentences.Dequeue();
-        StopAllCoroutines();
-        StartCoroutine(TypeSentence(currentSentence));
+        StopTypingCoroutine();
+        typingCoroutine = StartCoroutine(TypeSentence(currentSentence));
     }
 
-    IEnumerator TypeSentence(string sentence)
+    private IEnumerator TypeSentence(string sentence)
     {
-        isTyping = true;
-        dialogueText.text = "";
+        CurrentState = DialogueState.Typing;
+        dialogueText.text = string.Empty;
 
-        foreach (char letter in sentence.ToCharArray())
+        foreach (char letter in sentence)
         {
             dialogueText.text += letter;
             yield return new WaitForSeconds(typingSpeed);
         }
 
-        isTyping = false;
+        typingCoroutine = null;
+        CurrentState = DialogueState.WaitingForAdvance;
     }
 
-    void EndDialogue()
+    private void CompleteTypingImmediately()
     {
-        dialoguePanel.SetActive(false);
+        StopTypingCoroutine();
+        dialogueText.text = currentSentence;
+        CurrentState = DialogueState.WaitingForAdvance;
+    }
+
+    private void StopTypingCoroutine()
+    {
+        if (typingCoroutine == null)
+        {
+            return;
+        }
+
+        StopCoroutine(typingCoroutine);
+        typingCoroutine = null;
+    }
+
+    private void EndDialogue()
+    {
+        StopTypingCoroutine();
+        CurrentState = DialogueState.Closed;
+
+        if (dialoguePanel != null)
+        {
+            dialoguePanel.SetActive(false);
+        }
+
+        if (dialogueText != null)
+        {
+            dialogueText.text = string.Empty;
+        }
+
+        currentSentence = string.Empty;
+        CurrentState = DialogueState.Idle;
+    }
+
+    private bool ValidateUiBindings()
+    {
+        bool isValid = true;
+
+        if (dialoguePanel == null)
+        {
+            Debug.LogWarning("[DialogueManager] dialoguePanel is not assigned.");
+            isValid = false;
+        }
+
+        if (nameText == null)
+        {
+            Debug.LogWarning("[DialogueManager] nameText is not assigned.");
+            isValid = false;
+        }
+
+        if (dialogueText == null)
+        {
+            Debug.LogWarning("[DialogueManager] dialogueText is not assigned.");
+            isValid = false;
+        }
+
+        return isValid;
+    }
+
+    private void ConfigurePixelText(
+        TextMeshProUGUI textTarget,
+        Color faceColor,
+        float fontSize,
+        float characterSpacing,
+        FontStyles style)
+    {
+        if (textTarget == null)
+        {
+            return;
+        }
+
+        textTarget.color = faceColor;
+        if (dialogueFontAsset != null)
+        {
+            textTarget.font = dialogueFontAsset;
+        }
+        textTarget.fontSize = fontSize;
+        textTarget.fontStyle = style;
+        textTarget.characterSpacing = characterSpacing;
+        textTarget.enableWordWrapping = true;
+        textTarget.richText = false;
+        textTarget.extraPadding = false;
+
+        Material runtimeMaterial = textTarget.fontMaterial;
+        if (runtimeMaterial != null)
+        {
+            runtimeMaterial.SetFloat(ShaderUtilities.ID_OutlineWidth, textOutlineWidth);
+            runtimeMaterial.SetColor(ShaderUtilities.ID_OutlineColor, textOutlineColor);
+        }
     }
 }

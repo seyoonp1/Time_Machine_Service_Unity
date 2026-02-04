@@ -1,130 +1,188 @@
 using UnityEngine;
 using UnityEngine.Events;
+using System.Collections;
 
 public class BoxDialogueInteraction : MonoBehaviour, IInteractable
 {
-    [Header("기본 설정")]
-    public string speakerName = "나"; // 대화창에 뜰 이름
-    public Transform secondPosition;    // 이동할 위치 (빈 오브젝트 연결)
+    [Header("Basic Settings")]
+    public string speakerName = "Box";
+    public Transform secondPosition;
 
-    [Header("이벤트 설정")]
-    [Tooltip("T2 & 위치2 일 때 실행될 이벤트 (EventManager 연결)")]
+    [Header("Events")]
     public UnityEvent onT2TriggerAction;
 
-    // 내부 변수
     private bool isMoved = false;
+    private bool moveAfterDialoguePending = false;
 
-    // 📝 대사 데이터를 저장할 변수들
+    [Header("Dialogue Sets")]
+    public string messageBeforeTrace = "\uC5C4\uB9C8\uD55C\uD14C \uD63C\uB098\uAE30 \uC804\uC5D0 \uC800\uB141\uAE4C\uC9C0\uB294 \uCE58\uC6CC\uC57C\uACA0\uB2E4";
     public string[] dia_MoveSuccess;
     public string[] dia_CantMove;
     public string[] dia_Moved_T1;
     public string[] dia_Moved_T2;
     public string[] dia_Moved_T3;
 
-    void Awake()
+    private void Awake()
     {
-        // 👇 여기에 원하는 대사를 직접 적으세요! (콤마 , 로 구분하여 여러 줄 입력 가능)
-        
-        // 상황 1: (위치1 & T1) 상자 밀기 성공
-        dia_MoveSuccess = new string[] 
-        { 
-            "으랏차차!", 
-            "상자를 옆으로 밀었다." 
-        };
-
-        // 상황 2: (위치1 & T2,T3) 상자 못 밈
-        dia_CantMove = new string[] 
-        { 
-            "너무 무거워서 옮길 수 없어.",
-        };
-
-        // 상황 3: (위치2 & T1) 옮긴 후 아침
-        dia_Moved_T1 = new string[] 
-        { 
-            "밟고 올라가기엔 상자가 너무 낡았어.",
-            "무너질 것 같다." 
-        };
-
-        // 상황 4: (위치2 & T2) 옮긴 후 점심 -> 트리거 발동!
-        dia_Moved_T2 = new string[] 
-        { 
-            "신발장위에 바느질 도구를 얻었다."
-        };
-
-        // 상황 5: (위치2 & T3) 옮긴 후 저녁
-        dia_Moved_T3 = new string[] 
-        { 
-            "..." 
-        };
+        dia_MoveSuccess = EnsureDefault(dia_MoveSuccess, "Got it!", "Moved the box.");
+        dia_CantMove = EnsureDefault(dia_CantMove, "It is too heavy right now.");
+        dia_Moved_T1 = EnsureDefault(dia_Moved_T1, "If I climb now, it might collapse.");
+        dia_Moved_T2 = EnsureDefault(dia_Moved_T2, "Did someone hide something behind this?");
+        dia_Moved_T3 = EnsureDefault(dia_Moved_T3, "...");
     }
 
     public void OnInteract()
     {
-        // 1. 대화창이 이미 켜져있다면 '다음 문장'으로 넘기고 종료
-        if (DialogueManager.Instance.dialoguePanel.activeSelf)
+        DialogueManager dialogueManager = DialogueManager.Instance;
+        if (dialogueManager == null)
         {
-            DialogueManager.Instance.DisplayNextSentence();
+            Debug.LogWarning("[BoxDialogueInteraction] DialogueManager instance is missing.");
             return;
         }
 
-        // 2. 현재 시간 가져오기
+        if (dialogueManager.IsDialogueOpen)
+        {
+            dialogueManager.RequestAdvance();
+            return;
+        }
+
+        if (GameManager.Instance == null)
+        {
+            Debug.LogWarning("[BoxDialogueInteraction] GameManager instance is missing.");
+            return;
+        }
+
         TimeSlot time = GameManager.Instance.currentTime;
 
-        // 3. 상태에 따른 분기
         if (!isMoved)
         {
-            // === [첫 번째 위치일 때] ===
             if (time == TimeSlot.T1)
             {
-                // 대사 출력 & 이동
+                if (!TouchDialogueTrigger.HasEverInteracted)
+                {
+                    PlayDialogue(new[] { messageBeforeTrace });
+                    return;
+                }
+
                 PlayDialogue(dia_MoveSuccess);
-                MoveToSecondPosition();
+                StartMoveAfterDialogue();
             }
             else
             {
-                // 못 옮김
                 PlayDialogue(dia_CantMove);
             }
+
+            return;
         }
-        else
+
+        if (time == TimeSlot.T1)
         {
-            // === [두 번째 위치일 때] ===
-            if (time == TimeSlot.T1)
-            {
-                PlayDialogue(dia_Moved_T1);
-            }
-            else if (time == TimeSlot.T2)
-            {
-                onT2TriggerAction.Invoke();
-                PlayDialogue(dia_Moved_T2);
-                // 🔥 트리거 실행 (신발장 연출 등)
-                
-            }
-            else if (time == TimeSlot.T3)
-            {
-                // 대사가 있으면 출력
-                if (dia_Moved_T3.Length > 0 && dia_Moved_T3[0] != "...")
-                    PlayDialogue(dia_Moved_T3);
-            }
+            PlayDialogue(dia_Moved_T1);
+            return;
+        }
+
+        if (time == TimeSlot.T2)
+        {
+            onT2TriggerAction?.Invoke();
+            PlayDialogue(dia_Moved_T2);
+            return;
+        }
+
+        if (time == TimeSlot.T3 && HasMeaningfulLine(dia_Moved_T3))
+        {
+            PlayDialogue(dia_Moved_T3);
         }
     }
 
-    // 대화 매니저에게 대사를 넘기는 헬퍼 함수
-    void PlayDialogue(string[] lines)
+    private void PlayDialogue(string[] lines)
     {
-        if (lines != null && lines.Length > 0)
+        if (lines == null || lines.Length == 0)
         {
-            DialogueManager.Instance.StartDialogue(speakerName, lines);
+            return;
+        }
+
+        DialogueManager dialogueManager = DialogueManager.Instance;
+        if (dialogueManager == null)
+        {
+            return;
+        }
+
+        dialogueManager.StartDialogue(speakerName, lines);
+    }
+
+    private void MoveToSecondPositionWithFade()
+    {
+        ScreenFadeController fadeController = ScreenFadeController.Instance;
+        if (fadeController == null)
+        {
+            MoveToSecondPositionImmediate();
+            return;
+        }
+
+        Coroutine transition = fadeController.PlayFade(MoveToSecondPositionImmediate, 1f);
+        if (transition == null)
+        {
+            MoveToSecondPositionImmediate();
         }
     }
 
-    void MoveToSecondPosition()
+    private void StartMoveAfterDialogue()
+    {
+        if (moveAfterDialoguePending || isMoved)
+        {
+            return;
+        }
+
+        moveAfterDialoguePending = true;
+        StartCoroutine(MoveAfterDialogueEnds());
+    }
+
+    private IEnumerator MoveAfterDialogueEnds()
+    {
+        DialogueManager dialogueManager = DialogueManager.Instance;
+        while (dialogueManager != null && dialogueManager.IsDialogueOpen)
+        {
+            yield return null;
+            dialogueManager = DialogueManager.Instance;
+        }
+
+        MoveToSecondPositionWithFade();
+    }
+
+    private void MoveToSecondPositionImmediate()
     {
         if (secondPosition != null)
         {
             transform.position = secondPosition.position;
         }
+
         isMoved = true;
-        Debug.Log("상자 이동 완료!");
+        moveAfterDialoguePending = false;
+        Debug.Log("Box moved to second position.");
+    }
+
+    private static string[] EnsureDefault(string[] source, params string[] fallback)
+    {
+        if (source != null && source.Length > 0)
+        {
+            return source;
+        }
+
+        return fallback;
+    }
+
+    private static bool HasMeaningfulLine(string[] lines)
+    {
+        if (lines == null || lines.Length == 0)
+        {
+            return false;
+        }
+
+        if (lines.Length == 1 && lines[0] == "...")
+        {
+            return false;
+        }
+
+        return true;
     }
 }

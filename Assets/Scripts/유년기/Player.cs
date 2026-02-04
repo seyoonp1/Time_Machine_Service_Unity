@@ -39,7 +39,13 @@ public class PlayerController : MonoBehaviour
     void GetInput()
     {
         var k = Keyboard.current;
-        if (k == null) return;
+        bool isTransitioning = ScreenFadeController.Instance != null && ScreenFadeController.Instance.IsTransitioning;
+        if (k == null || TimeSlotSelectorUI.IsMenuOpen || isTransitioning)
+        {
+            _movementInput = Vector2.zero;
+            _isMoving = false;
+            return;
+        }
 
         float h = 0f;
         if (k.aKey.isPressed || k.leftArrowKey.isPressed) h -= 1f;
