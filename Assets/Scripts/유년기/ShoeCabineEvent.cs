@@ -4,7 +4,6 @@ using System.Collections; // 코루틴(시간차 실행)을 쓰기 위해 필수
 public class ShoeCabinetEvent : MonoBehaviour
 {
     [Header("제어할 오브젝트들")]
-    public GameObject shoeCabinet_Closed; // 신발장_0
     public GameObject shoeCabinet_Open;   // 신발장_열림_0
     public GameObject sewingKit;          // 바느질도구
 
@@ -12,11 +11,8 @@ public class ShoeCabinetEvent : MonoBehaviour
     public void Start()
     {
         // 게임 시작하자마자 "열린 신발장"과 "바느질도구"는 숨김
-        if (shoeCabinet_Open != null) shoeCabinet_Open.SetActive(false);
-        if (sewingKit != null) sewingKit.SetActive(false);
-
-        // "닫힌 신발장"은 혹시 꺼져있을까봐 확실하게 켜줌
-        if (shoeCabinet_Closed != null) shoeCabinet_Closed.SetActive(true);
+        if (shoeCabinet_Open != null) shoeCabinet_Open.SetActive(true);
+        if (sewingKit != null) sewingKit.SetActive(true);
     }
     public void StartSequence()
     {
@@ -32,7 +28,6 @@ public class ShoeCabinetEvent : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         // 2. 신발장 교체 & 바느질 도구 등장
-        if (shoeCabinet_Closed != null) shoeCabinet_Closed.SetActive(false);
         if (shoeCabinet_Open != null) shoeCabinet_Open.SetActive(true);
         if (sewingKit != null) sewingKit.SetActive(true);
 

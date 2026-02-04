@@ -95,9 +95,10 @@ public class BoxDialogueInteraction : MonoBehaviour, IInteractable
             }
             else if (time == TimeSlot.T2)
             {
+                onT2TriggerAction.Invoke();
                 PlayDialogue(dia_Moved_T2);
                 // 🔥 트리거 실행 (신발장 연출 등)
-                onT2TriggerAction.Invoke();
+                
             }
             else if (time == TimeSlot.T3)
             {
