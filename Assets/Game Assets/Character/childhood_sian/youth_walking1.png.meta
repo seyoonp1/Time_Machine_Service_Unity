@@ -1,0 +1,338 @@
+fileFormatVersion: 2
+guid: 58ff8a21f041f904cb2249a5e9de75fe
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: -1762876876537956313
+    second: youth_walking1_0
+  - first:
+      213: 3484373386718779700
+    second: youth_walking1_1
+  - first:
+      213: -6084436188030491978
+    second: youth_walking1_2
+  - first:
+      213: -4922742927990973420
+    second: youth_walking1_3
+  - first:
+      213: 9070333704843793743
+    second: youth_walking1_4
+  - first:
+      213: 4091752214838409452
+    second: youth_walking1_5
+  - first:
+      213: -9118319497679949324
+    second: youth_walking1_6
+  - first:
+      213: 8389903327970976060
+    second: youth_walking1_7
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: youth_walking1_0
+      rect:
+        serializedVersion: 2
+        x: 31
+        y: 707
+        width: 71
+        height: 258
+      alignment: 9
+      pivot: {x: 0.49295774, y: 0.74418604}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 728743722d00987e0800000000000000
+      internalID: -1762876876537956313
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: youth_walking1_1
+      rect:
+        serializedVersion: 2
+        x: 196
+        y: 714
+        width: 102
+        height: 255
+      alignment: 9
+      pivot: {x: 0.5294118, y: 0.7372549}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 439923c522bfa5030800000000000000
+      internalID: 3484373386718779700
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: youth_walking1_2
+      rect:
+        serializedVersion: 2
+        x: 352
+        y: 721
+        width: 144
+        height: 244
+      alignment: 9
+      pivot: {x: 0.5625, y: 0.7336065}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 6b229e1168dbf8ba0800000000000000
+      internalID: -6084436188030491978
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: youth_walking1_3
+      rect:
+        serializedVersion: 2
+        x: 542
+        y: 708
+        width: 116
+        height: 252
+      alignment: 9
+      pivot: {x: 0.49137932, y: 0.7420635}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 41c18888367eeabb0800000000000000
+      internalID: -4922742927990973420
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: youth_walking1_4
+      rect:
+        serializedVersion: 2
+        x: 31
+        y: 376
+        width: 74
+        height: 262
+      alignment: 9
+      pivot: {x: 0.4864865, y: 0.7519084}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f459777a27c40ed70800000000000000
+      internalID: 9070333704843793743
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: youth_walking1_5
+      rect:
+        serializedVersion: 2
+        x: 191
+        y: 381
+        width: 103
+        height: 260
+      alignment: 9
+      pivot: {x: 0.5339806, y: 0.7423077}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ce87c5ad5f2d8c830800000000000000
+      internalID: 4091752214838409452
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: youth_walking1_6
+      rect:
+        serializedVersion: 2
+        x: 354
+        y: 383
+        width: 138
+        height: 257
+      alignment: 9
+      pivot: {x: 0.6014493, y: 0.74319065}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4f1b4405ab8357180800000000000000
+      internalID: -9118319497679949324
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: youth_walking1_7
+      rect:
+        serializedVersion: 2
+        x: 548
+        y: 386
+        width: 108
+        height: 255
+      alignment: 9
+      pivot: {x: 0.4537037, y: 0.7490196}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c31e39b00acee6470800000000000000
+      internalID: 8389903327970976060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 48a16ab8f665b8241948e9683bdfb27e
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      youth_walking1_0: -1762876876537956313
+      youth_walking1_1: 3484373386718779700
+      youth_walking1_2: -6084436188030491978
+      youth_walking1_3: -4922742927990973420
+      youth_walking1_4: 9070333704843793743
+      youth_walking1_5: 4091752214838409452
+      youth_walking1_6: -9118319497679949324
+      youth_walking1_7: 8389903327970976060
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
