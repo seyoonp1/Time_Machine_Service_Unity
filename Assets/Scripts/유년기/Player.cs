@@ -40,7 +40,8 @@ public class PlayerController : MonoBehaviour
     {
         var k = Keyboard.current;
         bool isTransitioning = ScreenFadeController.Instance != null && ScreenFadeController.Instance.IsTransitioning;
-        if (k == null || TimeSlotSelectorUI.IsMenuOpen || isTransitioning)
+        bool isDialogueOpen = DialogueManager.Instance != null && DialogueManager.Instance.IsDialogueOpen;
+        if (InputLock.IsLocked || isDialogueOpen || k == null || TimeSlotSelectorUI.IsMenuOpen || isTransitioning)
         {
             _movementInput = Vector2.zero;
             _isMoving = false;

@@ -40,8 +40,14 @@ public class DialogueManager : MonoBehaviour
     public DialogueState CurrentState { get; private set; } = DialogueState.Idle;
     public bool IsDialogueOpen => CurrentState != DialogueState.Idle && CurrentState != DialogueState.Closed;
 
-    private readonly Queue<string> sentences = new Queue<string>();
-    private string currentSentence = string.Empty;
+    private struct DialogueLine
+    {
+        public string Speaker;
+        public string Text;
+    }
+
+    private readonly Queue<DialogueLine> sentences = new Queue<DialogueLine>();
+    private DialogueLine currentLine;
     private Coroutine typingCoroutine;
 
     private void Awake()
@@ -89,18 +95,41 @@ public class DialogueManager : MonoBehaviour
             portraitImage.sprite = portrait;
         }
 
+        StartDialogue(BuildLinesWithSpeaker(speakerName, lines));
+    }
+
+    public void StartDialogue(IList<(string Speaker, string Text)> lines, Sprite portrait = null)
+    {
+        if (!ValidateUiBindings())
+        {
+            EndDialogue();
+            return;
+        }
+
+        dialoguePanel.SetActive(true);
+
+        if (portraitImage != null)
+        {
+            portraitImage.gameObject.SetActive(portrait != null);
+            portraitImage.sprite = portrait;
+        }
+
         sentences.Clear();
         if (lines != null)
         {
-            foreach (string line in lines)
+            foreach (var line in lines)
             {
-                sentences.Enqueue(line ?? string.Empty);
+                sentences.Enqueue(new DialogueLine
+                {
+                    Speaker = line.Speaker ?? string.Empty,
+                    Text = line.Text ?? string.Empty
+                });
             }
         }
 
         if (sentences.Count == 0)
         {
-            sentences.Enqueue("...");
+            sentences.Enqueue(new DialogueLine { Speaker = string.Empty, Text = "..." });
         }
 
         ShowNextSentenceFromQueue();
@@ -167,9 +196,13 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        currentSentence = sentences.Dequeue();
+        currentLine = sentences.Dequeue();
+        if (nameText != null)
+        {
+            nameText.text = currentLine.Speaker ?? string.Empty;
+        }
         StopTypingCoroutine();
-        typingCoroutine = StartCoroutine(TypeSentence(currentSentence));
+        typingCoroutine = StartCoroutine(TypeSentence(currentLine.Text));
     }
 
     private IEnumerator TypeSentence(string sentence)
@@ -190,7 +223,7 @@ public class DialogueManager : MonoBehaviour
     private void CompleteTypingImmediately()
     {
         StopTypingCoroutine();
-        dialogueText.text = currentSentence;
+        dialogueText.text = currentLine.Text ?? string.Empty;
         CurrentState = DialogueState.WaitingForAdvance;
     }
 
@@ -220,7 +253,7 @@ public class DialogueManager : MonoBehaviour
             dialogueText.text = string.Empty;
         }
 
-        currentSentence = string.Empty;
+        currentLine = new DialogueLine();
         CurrentState = DialogueState.Idle;
     }
 
@@ -279,5 +312,19 @@ public class DialogueManager : MonoBehaviour
             runtimeMaterial.SetFloat(ShaderUtilities.ID_OutlineWidth, textOutlineWidth);
             runtimeMaterial.SetColor(ShaderUtilities.ID_OutlineColor, textOutlineColor);
         }
+    }
+
+    private static IList<(string Speaker, string Text)> BuildLinesWithSpeaker(string speakerName, string[] lines)
+    {
+        List<(string Speaker, string Text)> result = new List<(string Speaker, string Text)>();
+        if (lines != null)
+        {
+            foreach (string line in lines)
+            {
+                result.Add((speakerName ?? string.Empty, line ?? string.Empty));
+            }
+        }
+
+        return result;
     }
 }

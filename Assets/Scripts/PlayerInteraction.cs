@@ -17,6 +17,20 @@ public class PlayerInteraction : MonoBehaviour
     {
         UpdatePromptUI();
 
+        if (InputLock.IsLocked)
+        {
+            DialogueManager lockedDialogueManager = DialogueManager.Instance;
+            if (lockedDialogueManager != null && lockedDialogueManager.IsDialogueOpen)
+            {
+                if (Keyboard.current != null &&
+                    (Keyboard.current.fKey.wasPressedThisFrame || Keyboard.current.spaceKey.wasPressedThisFrame))
+                {
+                    lockedDialogueManager.RequestAdvance();
+                }
+            }
+            return;
+        }
+
         if (Keyboard.current == null)
         {
             
@@ -54,6 +68,16 @@ public class PlayerInteraction : MonoBehaviour
 
     private void UpdatePromptUI()
     {
+        if (InputLock.IsLocked)
+        {
+            currentInteractable = null;
+            if (promptSpriteObject != null && promptSpriteObject.activeSelf)
+            {
+                promptSpriteObject.SetActive(false);
+            }
+            return;
+        }
+
         bool isTransitioning = ScreenFadeController.Instance != null && ScreenFadeController.Instance.IsTransitioning;
         if (isTransitioning)
         {

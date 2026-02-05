@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class SimpleObjectInteraction : MonoBehaviour, IInteractable
 {
+    [SerializeField] private string interactionId;
+
     [SerializeField] private string speakerName = "사물";
     [SerializeField, TextArea] private string message = "...";
 
@@ -21,5 +23,10 @@ public class SimpleObjectInteraction : MonoBehaviour, IInteractable
         }
 
         dialogueManager.StartDialogue(speakerName, new[] { message });
+        InteractionProgressTracker tracker = InteractionProgressTracker.Instance;
+        if (tracker != null)
+        {
+            tracker.RegisterInteraction(interactionId);
+        }
     }
 }

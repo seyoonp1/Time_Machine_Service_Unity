@@ -22,6 +22,10 @@ public class TimeSlotSelectorUI : MonoBehaviour
     [SerializeField] private Sprite[] eveningButtonStates = new Sprite[SlotCount];
     [SerializeField] private Sprite[] nightButtonStates = new Sprite[SlotCount];
 
+    [Header("Tab Blocked Dialogue")]
+    [SerializeField] private string tabBlockedSpeaker = "\uB098";
+    [SerializeField, TextArea] private string tabBlockedMessage = "\uC77C\uB2E8 \uC8FC\uBCC0\uC744 \uB458\uB7EC\uBCF4\uC790";
+
     private Canvas _canvas;
     private GameObject _rootPanel;
     private bool _isOpen;
@@ -69,6 +73,24 @@ public class TimeSlotSelectorUI : MonoBehaviour
             return;
         }
 
+        if (InputLock.IsLocked)
+        {
+            if (_isOpen)
+            {
+                CloseMenu(false);
+            }
+            return;
+        }
+
+        if (IsDialogueOpen())
+        {
+            if (_isOpen)
+            {
+                CloseMenu(false);
+            }
+            return;
+        }
+
         if (keyboard.tabKey.wasPressedThisFrame)
         {
             if (_isOpen)
@@ -77,6 +99,12 @@ public class TimeSlotSelectorUI : MonoBehaviour
             }
             else if (!IsDialogueOpen())
             {
+                if (IsTimeMenuBlocked())
+                {
+                    ShowTabBlockedDialogue();
+                    return;
+                }
+
                 OpenMenu();
             }
 
@@ -179,6 +207,29 @@ public class TimeSlotSelectorUI : MonoBehaviour
     private bool IsDialogueOpen()
     {
         return DialogueManager.Instance != null && DialogueManager.Instance.IsDialogueOpen;
+    }
+
+    private bool IsTimeMenuBlocked()
+    {
+        InteractionProgressTracker tracker = InteractionProgressTracker.Instance;
+        if (tracker == null)
+        {
+            return false;
+        }
+
+        return !tracker.IsAllInteracted;
+    }
+
+    private void ShowTabBlockedDialogue()
+    {
+        DialogueManager dialogueManager = DialogueManager.Instance;
+        if (dialogueManager == null || dialogueManager.IsDialogueOpen)
+        {
+            return;
+        }
+
+        string line = string.IsNullOrWhiteSpace(tabBlockedMessage) ? "..." : tabBlockedMessage;
+        dialogueManager.StartDialogue(tabBlockedSpeaker, new[] { line });
     }
 
     private int GetCurrentIndex()
