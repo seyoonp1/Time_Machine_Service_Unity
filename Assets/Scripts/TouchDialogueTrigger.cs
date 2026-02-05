@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class TouchDialogueTrigger : MonoBehaviour, IInteractable
@@ -30,6 +31,17 @@ public class TouchDialogueTrigger : MonoBehaviour, IInteractable
         "\uADFC\uB370 \uC55E\uC5D0 \uB098\uD0C0\uB09C \uC800\uAC74 \uBB50\uC9C0?"
     };
 
+    [Header("Ready State Sequence")]
+    [SerializeField] private GameObject afterimageToHide;
+    [SerializeField] private GameObject maleBearToShow;
+    [SerializeField] private GameObject glitchToShow;
+    [SerializeField] private string maleBearObjectName = "\uB0A8\uC790 \uACF0\uC778\uD615_0";
+    [SerializeField] private string glitchObjectName = "\uAE00\uB9AC\uCE58_0";
+    [SerializeField] private string triggerHideAfterimageLine = "\uC778\uD615\uC744 \uB2E4 \uACE0\uCCE4\uB2E4.";
+    [SerializeField] private string triggerShowGlitchLine = "\uACBD\uACE0? \uBB34\uC2A8 \uC18C\uB9AC\uC9C0?";
+
+    private Coroutine readySequenceCoroutine;
+
     public void OnInteract()
     {
         DialogueManager targetDialogueManager = dialogueManager != null ? dialogueManager : DialogueManager.Instance;
@@ -57,6 +69,132 @@ public class TouchDialogueTrigger : MonoBehaviour, IInteractable
         }
 
         targetDialogueManager.StartDialogue(speakerName, resolvedLines);
+        if (ChildhoodItemState.IsReady && resolvedLines == linesAfterReady)
+        {
+            StartReadySequence(targetDialogueManager);
+        }
         HasEverInteracted = true;
+    }
+
+    private void StartReadySequence(DialogueManager dialogueManagerInstance)
+    {
+        if (readySequenceCoroutine != null)
+        {
+            StopCoroutine(readySequenceCoroutine);
+        }
+
+        readySequenceCoroutine = StartCoroutine(WatchReadyDialogue(dialogueManagerInstance));
+    }
+
+    private IEnumerator WatchReadyDialogue(DialogueManager dialogueManagerInstance)
+    {
+        bool hidAfterimage = false;
+        bool showedGlitch = false;
+
+        while (dialogueManagerInstance != null && dialogueManagerInstance.IsDialogueOpen)
+        {
+            if (dialogueManagerInstance.CurrentState == DialogueState.WaitingForAdvance)
+            {
+                string currentText = dialogueManagerInstance.dialogueText != null
+                    ? dialogueManagerInstance.dialogueText.text
+                    : string.Empty;
+
+                if (!hidAfterimage && LineMatches(currentText, triggerHideAfterimageLine))
+                {
+                    GameObject resolvedAfterimage = afterimageToHide != null ? afterimageToHide : gameObject;
+                    if (resolvedAfterimage != null)
+                    {
+                        resolvedAfterimage.SetActive(false);
+                    }
+
+                    GameObject resolvedBear = ResolveByNameIfMissing(maleBearToShow, maleBearObjectName);
+                    if (resolvedBear != null)
+                    {
+                        resolvedBear.SetActive(true);
+                    }
+
+                    hidAfterimage = true;
+                }
+
+                if (!showedGlitch && LineMatches(currentText, triggerShowGlitchLine))
+                {
+                    GameObject resolvedGlitch = ResolveByNameIfMissing(glitchToShow, glitchObjectName);
+                    if (resolvedGlitch != null)
+                    {
+                        resolvedGlitch.SetActive(true);
+                        EnsureGlitchInteraction(resolvedGlitch);
+                    }
+
+                    showedGlitch = true;
+                }
+
+                if (hidAfterimage && showedGlitch)
+                {
+                    break;
+                }
+            }
+
+            yield return null;
+        }
+    }
+
+    private static GameObject ResolveByNameIfMissing(GameObject existing, string objectName)
+    {
+        if (existing != null)
+        {
+            return existing;
+        }
+
+        if (string.IsNullOrWhiteSpace(objectName))
+        {
+            return null;
+        }
+
+        GameObject active = GameObject.Find(objectName);
+        if (active != null)
+        {
+            return active;
+        }
+
+        GameObject[] allObjects = Resources.FindObjectsOfTypeAll<GameObject>();
+        foreach (GameObject go in allObjects)
+        {
+            if (go != null && go.name == objectName)
+            {
+                return go;
+            }
+        }
+
+        return null;
+    }
+
+    private static bool LineMatches(string currentText, string triggerText)
+    {
+        if (string.IsNullOrWhiteSpace(triggerText))
+        {
+            return false;
+        }
+
+        if (string.IsNullOrEmpty(currentText))
+        {
+            return false;
+        }
+
+        return currentText.Trim().Contains(triggerText.Trim());
+    }
+
+    private static void EnsureGlitchInteraction(GameObject target)
+    {
+        if (target == null)
+        {
+            return;
+        }
+
+        if (target.GetComponent<GlitchPuzzleInteraction>() != null)
+        {
+            return;
+        }
+
+        target.AddComponent<GlitchPuzzleInteraction>();
     }
 }

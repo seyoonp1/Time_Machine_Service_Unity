@@ -1,14 +1,14 @@
-story_0101	¿©±ä ¾îµðÁö..
-story_0101	Àá±ñ.. ¿©±â´Â ³» ¹æÀÌÀÝ¾Æ?
-story_0101	¾î¶»°Ô µÈ°ÅÁö..
-story_0101	±â¾ïÀÌ ³ªÁú ¾Ê¾Æ..
-story_0101	ÁÖÀ§¸¦ µÑ·¯º¸¸ç Å½»öÇØº¸ÀÚ.
-shelf_01	ºó ¼±¹ÝÀÌ´Ù.
-bed_01	³» Ä§´ëÀÎ °Í °°´Ù.
-exit_01	Áö±ÝÀº ³ª°¡Áö ¸»ÀÚ.
-TMS_01	"""°ú°Å°¡ ¹Ù²î¸é, ¹Ì·¡ÀÇ ´ç½Åµµ ¹Ù²ò´Ï´Ù."" "
-TMS_01	ÀÌ ÀåÄ¡´Â ¹¹Áö?
-TMS_01	ÀÛµ¿½ÃÄÑ º¼±î?
-story_0102	"ÀåÄ¡¸¦ ÀÛµ¿½ÃÅ°ÀÚ, ¾È³» À½¼ºÀÌ µé·È´Ù."
-story_0102	[System]: TM SERVICE ÇÁ·ÎÅäÄÝÀ» ½ÃÀÛÇÕ´Ï´Ù.
-story_0102	[System]: ¸Å´º¾óÀ» Ç¥½ÃÇÕ´Ï´Ù.
+story_0101	ì—¬ê¸´ ì–´ë””ì§€..
+story_0101	ìž ê¹.. ì—¬ê¸°ëŠ” ë‚´ ë°©ì´ìž–ì•„?
+story_0101	ì–´ë–»ê²Œ ëœê±°ì§€..
+story_0101	ê¸°ì–µì´ ë‚˜ì§ˆ ì•Šì•„..
+story_0101	ì£¼ìœ„ë¥¼ ë‘˜ëŸ¬ë³´ë©° íƒìƒ‰í•´ë³´ìž.
+shelf_01	ì†Œí¬ê°€ ì™”ë‹¤.
+bed_01	ë‚´ ì¹¨ëŒ€ì¸ ê²ƒ ê°™ë‹¤.
+exit_01	ì§€ê¸ˆì€ ë‚˜ê°€ì§€ ë§ìž.
+TMS_01	"""ê³¼ê±°ê°€ ë°”ë€Œë©´, ë¯¸ëž˜ì˜ ë‹¹ì‹ ë„ ë°”ë€ë‹ˆë‹¤."" "
+TMS_01	ì´ ìž¥ì¹˜ëŠ” ë­ì§€?
+TMS_01	ìž‘ë™ì‹œì¼œ ë³¼ê¹Œ?
+story_0102	"ìž¥ì¹˜ë¥¼ ìž‘ë™ì‹œí‚¤ìž, ì•ˆë‚´ ìŒì„±ì´ ë“¤ë ¸ë‹¤."
+story_0102	[System]: TM SERVICE í”„ë¡œí† ì½œì„ ì‹œìž‘í•©ë‹ˆë‹¤.
+story_0102	[System]: ë§¤ë‰´ì–¼ì„ í‘œì‹œí•©ë‹ˆë‹¤.

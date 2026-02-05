@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class StoryStartSequence : MonoBehaviour
 {
+    private static bool hasPlayedGlobal;
     [Header("Dialogue")]
     [SerializeField] private string speakerName = "";
     [TextArea]
@@ -31,12 +32,13 @@ public class StoryStartSequence : MonoBehaviour
 
     private void Start()
     {
-        if (hasPlayed)
+        if (hasPlayed || hasPlayedGlobal)
         {
             return;
         }
 
         hasPlayed = true;
+        hasPlayedGlobal = true;
         StartCoroutine(RunSequence());
     }
 

@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
     [Header("Animation")]
     [SerializeField] GameObject idleSprite;
     [SerializeField] GameObject walkSprite;
+    [SerializeField] bool suppressAnimation;
 
     Rigidbody2D _rb;
     Vector2 _movementInput;
@@ -85,8 +86,25 @@ public class PlayerController : MonoBehaviour
 
     void UpdateAnimation()
     {
+        if (suppressAnimation)
+        {
+            if (idleSprite != null) idleSprite.SetActive(false);
+            if (walkSprite != null) walkSprite.SetActive(false);
+            return;
+        }
+
         // 간단한 오브젝트 교체 방식 유지
         if (idleSprite != null) idleSprite.SetActive(!_isMoving);
         if (walkSprite != null) walkSprite.SetActive(_isMoving);
+    }
+
+    public void SetAnimationSuppressed(bool suppressed)
+    {
+        suppressAnimation = suppressed;
+        if (suppressAnimation)
+        {
+            if (idleSprite != null) idleSprite.SetActive(false);
+            if (walkSprite != null) walkSprite.SetActive(false);
+        }
     }
 }

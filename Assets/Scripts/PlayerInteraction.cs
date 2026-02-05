@@ -7,6 +7,7 @@ public class PlayerInteraction : MonoBehaviour
     public float interactRange = 1.5f;
     public LayerMask interactLayer;
     public Vector2 centerOffset;
+    [SerializeField] private bool mirrorOffsetWithFacing = true;
 
     [Header("UI Settings")]
     public GameObject promptSpriteObject;
@@ -110,7 +111,7 @@ public class PlayerInteraction : MonoBehaviour
             return;
         }
 
-        Vector2 interactionPos = (Vector2)transform.position + centerOffset;
+        Vector2 interactionPos = (Vector2)transform.position + GetFacingOffset();
         Collider2D[] hitColliders = Physics2D.OverlapCircleAll(interactionPos, interactRange, interactLayer);
 
         Collider2D targetCollider = null;
@@ -170,7 +171,18 @@ public class PlayerInteraction : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
-        Vector3 drawPos = transform.position + (Vector3)centerOffset;
+        Vector3 drawPos = transform.position + (Vector3)GetFacingOffset();
         Gizmos.DrawWireSphere(drawPos, interactRange);
+    }
+
+    private Vector2 GetFacingOffset()
+    {
+        if (!mirrorOffsetWithFacing)
+        {
+            return centerOffset;
+        }
+
+        float sign = transform.localScale.x >= 0f ? 1f : -1f;
+        return new Vector2(centerOffset.x * sign, centerOffset.y);
     }
 }
