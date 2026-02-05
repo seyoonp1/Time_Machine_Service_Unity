@@ -8,12 +8,12 @@ public class ParcelInteraction : MonoBehaviour, IInteractable
     [SerializeField] private string speakerName = "?";
     [SerializeField, TextArea] private string[] introLines =
     {
-        "??? ???, ??? ??? ????.",
-        "? ??? ???"
+        "과거가 바뀌면, 미래의 당신도 바뀝니다.",
+        "이 장치는 뭐지?"
     };
     [SerializeField, TextArea] private string[] finalLines =
     {
-        "???? ???"
+        "작동시켜 볼까?"
     };
 
     [Header("Parcel Visuals")]

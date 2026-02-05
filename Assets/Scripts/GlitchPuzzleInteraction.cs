@@ -17,6 +17,7 @@ public class GlitchPuzzleInteraction : MonoBehaviour, IInteractable
             return;
         }
 
+        StoreReturnState();
         SyncTimeToPuzzle();
         LoadPuzzleScene();
     }
@@ -41,6 +42,20 @@ public class GlitchPuzzleInteraction : MonoBehaviour, IInteractable
             default:
                 GlobalGameManager.Instance.currentTimeState = TimeState.Morning;
                 break;
+        }
+    }
+
+    private void StoreReturnState()
+    {
+        if (GameManager.Instance != null)
+        {
+            SceneReturnState.StoreReturnTime(GameManager.Instance.currentTime);
+        }
+
+        PlayerController player = FindObjectOfType<PlayerController>();
+        if (player != null)
+        {
+            SceneReturnState.StoreReturnPosition(player.transform.position);
         }
     }
 

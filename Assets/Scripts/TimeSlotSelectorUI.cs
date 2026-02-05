@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class TimeSlotSelectorUI : MonoBehaviour
 {
     public static bool IsMenuOpen => _instance != null && _instance._isOpen;
+    public static bool ForceDisabled { get; set; }
 
     private static TimeSlotSelectorUI _instance;
 
@@ -70,6 +71,15 @@ public class TimeSlotSelectorUI : MonoBehaviour
         Keyboard keyboard = Keyboard.current;
         if (keyboard == null)
         {
+            return;
+        }
+
+        if (ForceDisabled)
+        {
+            if (_isOpen)
+            {
+                CloseMenu(false);
+            }
             return;
         }
 

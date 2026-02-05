@@ -93,48 +93,51 @@ public class TouchDialogueTrigger : MonoBehaviour, IInteractable
 
         while (dialogueManagerInstance != null && dialogueManagerInstance.IsDialogueOpen)
         {
-            if (dialogueManagerInstance.CurrentState == DialogueState.WaitingForAdvance)
+            string currentText = dialogueManagerInstance.dialogueText != null
+                ? dialogueManagerInstance.dialogueText.text
+                : string.Empty;
+
+            if (!hidAfterimage && LineMatches(currentText, triggerHideAfterimageLine))
             {
-                string currentText = dialogueManagerInstance.dialogueText != null
-                    ? dialogueManagerInstance.dialogueText.text
-                    : string.Empty;
-
-                if (!hidAfterimage && LineMatches(currentText, triggerHideAfterimageLine))
+                GameObject resolvedAfterimage = afterimageToHide != null ? afterimageToHide : gameObject;
+                if (resolvedAfterimage != null)
                 {
-                    GameObject resolvedAfterimage = afterimageToHide != null ? afterimageToHide : gameObject;
-                    if (resolvedAfterimage != null)
-                    {
-                        resolvedAfterimage.SetActive(false);
-                    }
-
-                    GameObject resolvedBear = ResolveByNameIfMissing(maleBearToShow, maleBearObjectName);
-                    if (resolvedBear != null)
-                    {
-                        resolvedBear.SetActive(true);
-                    }
-
-                    hidAfterimage = true;
+                    resolvedAfterimage.SetActive(false);
                 }
 
-                if (!showedGlitch && LineMatches(currentText, triggerShowGlitchLine))
+                GameObject resolvedBear = ResolveByNameIfMissing(maleBearToShow, maleBearObjectName);
+                if (resolvedBear != null)
                 {
-                    GameObject resolvedGlitch = ResolveByNameIfMissing(glitchToShow, glitchObjectName);
-                    if (resolvedGlitch != null)
-                    {
-                        resolvedGlitch.SetActive(true);
-                        EnsureGlitchInteraction(resolvedGlitch);
-                    }
-
-                    showedGlitch = true;
+                    resolvedBear.SetActive(true);
                 }
 
-                if (hidAfterimage && showedGlitch)
-                {
-                    break;
-                }
+                hidAfterimage = true;
+            }
+
+            if (hidAfterimage && showedGlitch)
+            {
+                break;
             }
 
             yield return null;
+        }
+
+        if (!showedGlitch)
+        {
+            GameObject resolvedGlitch = ResolveByNameIfMissing(glitchToShow, glitchObjectName);
+            if (resolvedGlitch != null)
+            {
+                Transform anchor = afterimageToHide != null ? afterimageToHide.transform : transform;
+                resolvedGlitch.transform.position = anchor.position;
+                resolvedGlitch.SetActive(true);
+                EnsureGlitchInteraction(resolvedGlitch);
+            }
+            else
+            {
+                Debug.LogWarning("[TouchDialogueTrigger] glitch object not found to show.");
+            }
+
+            showedGlitch = true;
         }
     }
 
@@ -165,6 +168,33 @@ public class TouchDialogueTrigger : MonoBehaviour, IInteractable
             }
         }
 
+        // Fuzzy fallback for glitch/bear naming variations
+        string lower = objectName.ToLowerInvariant();
+        bool wantGlitch = lower.Contains("glitch") || objectName.Contains("글리치");
+        bool wantBear = objectName.Contains("곰인형") || objectName.Contains("곰");
+
+        if (wantGlitch || wantBear)
+        {
+            foreach (GameObject go in allObjects)
+            {
+                if (go == null)
+                {
+                    continue;
+                }
+
+                string nameLower = go.name.ToLowerInvariant();
+                if (wantGlitch && (nameLower.Contains("glitch") || go.name.Contains("글리치")))
+                {
+                    return go;
+                }
+
+                if (wantBear && (go.name.Contains("곰인형") || go.name.Contains("곰")))
+                {
+                    return go;
+                }
+            }
+        }
+
         return null;
     }
 
@@ -180,7 +210,24 @@ public class TouchDialogueTrigger : MonoBehaviour, IInteractable
             return false;
         }
 
-        return currentText.Trim().Contains(triggerText.Trim());
+        string normalizedCurrent = NormalizeLine(currentText);
+        string normalizedTrigger = NormalizeLine(triggerText);
+        return normalizedCurrent.Contains(normalizedTrigger);
+    }
+
+    private static string NormalizeLine(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return string.Empty;
+        }
+
+        string normalized = text.Replace("\"", string.Empty)
+            .Replace("“", string.Empty)
+            .Replace("”", string.Empty)
+            .Trim();
+
+        return normalized;
     }
 
     private static void EnsureGlitchInteraction(GameObject target)

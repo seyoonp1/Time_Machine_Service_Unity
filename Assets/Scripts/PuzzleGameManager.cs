@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public class PuzzleGameManager : MonoBehaviour
@@ -12,30 +13,30 @@ public class PuzzleGameManager : MonoBehaviour
     public KeyCode manualExitKey = KeyCode.Escape;
     public float exitFadeDuration = 1f;
 
-    [Header("±âº» ¼³Á¤")]
+    [Header("ï¿½âº» ï¿½ï¿½ï¿½ï¿½")]
     public List<TileBlock> tiles;
     public List<Transform> highlightPool;
     public List<Transform> blueHighlightPool;
 
-    [Tooltip("Å¸ÀÏ °£°Ý (ÇÈ¼¿ ´ÜÀ§)")]
+    [Tooltip("Å¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½È¼ï¿½ ï¿½ï¿½ï¿½ï¿½)")]
     public float cellSize = 16f;
     public int width = 3;
     public int height = 3;
 
-    [Header("¿Àµð¿À ¼³Á¤")] // ¡Ú [Ãß°¡]
-    public AudioClip puzzleBGM;      // ÆÛÁñ ¹è°æÀ½¾Ç
-    public AudioClip sfxBreak;       // ±úÁö´Â ¼Ò¸®
-    public AudioClip sfxConnect;     // ¿¬°áµÇ´Â ¼Ò¸®
-    public AudioClip sfxSlide;     // ½½¶óÀÌµå ¼Ò¸®
-    public AudioClip sfxClear;       // Å¬¸®¾î ¼Ò¸® (¼±ÅÃ)
+    [Header("ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½")] // ï¿½ï¿½ [ï¿½ß°ï¿½]
+    public AudioClip puzzleBGM;      // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    public AudioClip sfxBreak;       // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ò¸ï¿½
+    public AudioClip sfxConnect;     // ï¿½ï¿½ï¿½ï¿½Ç´ï¿½ ï¿½Ò¸ï¿½
+    public AudioClip sfxSlide;     // ï¿½ï¿½ï¿½ï¿½ï¿½Ìµï¿½ ï¿½Ò¸ï¿½
+    public AudioClip sfxClear;       // Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½Ò¸ï¿½ (ï¿½ï¿½ï¿½ï¿½)
 
-    // Å»Ãâ±¸ ÁÂÇ¥ (3, 1)
+    // Å»ï¿½â±¸ ï¿½ï¿½Ç¥ (3, 1)
     private readonly Vector2Int exitPos = new Vector2Int(3, 1);
 
-    [Header("¿¬°á ºñÁÖ¾ó")]
+    [Header("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ö¾ï¿½")]
     public GameObject connectionPrefab;
 
-    [Header("ºñÁÖ¾ó ¼³Á¤ (¹° Å¸ÀÏ)")]
+    [Header("ï¿½ï¿½ï¿½Ö¾ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ Å¸ï¿½ï¿½)")]
     public Sprite waterMorningSprite;
     public Sprite waterEveningSprite;
     public Sprite waterNightSprite;
@@ -58,7 +59,7 @@ public class PuzzleGameManager : MonoBehaviour
         if (GlobalGameManager.Instance != null)
         {
             currentState = GlobalGameManager.Instance.currentTimeState;
-            Debug.Log($"[PGM] ÇöÀç ½Ã°£´ë: {currentState}");
+            Debug.Log($"[PGM] ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ï¿½ï¿½: {currentState}");
 
             UpdateTileVisuals();
 
@@ -70,9 +71,9 @@ public class PuzzleGameManager : MonoBehaviour
                 if ((currentState == TimeState.Evening || currentState == TimeState.Night) &&
                     targetTile != null && targetTile.type == TileType.Water)
                 {
-                    Debug.Log(">> Äç! ÀúÀåµÈ À§Ä¡°¡ ¹° Å¸ÀÏ À§¶ó ºÎ¼­Á³½À´Ï´Ù! (¸®¼Â)");
+                    Debug.Log(">> ï¿½ï¿½! ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ Å¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Î¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½! (ï¿½ï¿½ï¿½ï¿½)");
 
-                    // ¡Ú [Ãß°¡] ½ÃÀÛÇÏÀÚ¸¶ÀÚ ºÎ¼­Áö´Â ¼Ò¸®
+                    // ï¿½ï¿½ [ï¿½ß°ï¿½] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½ï¿½ ï¿½Î¼ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ò¸ï¿½
                     if (AudioManager.Instance != null) AudioManager.Instance.PlaySFX(sfxBreak);
 
                     ResetAllTiles();
@@ -85,9 +86,9 @@ public class PuzzleGameManager : MonoBehaviour
             }
             else if ((currentState == TimeState.Evening || currentState == TimeState.Night) && CheckIfRedTileIsDead())
             {
-                Debug.Log(">> Äç! ½ÃÀÛ À§Ä¡°¡ ¹° Å¸ÀÏ À§ÀÔ´Ï´Ù! (¸®¼Â)");
+                Debug.Log(">> ï¿½ï¿½! ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ Å¸ï¿½ï¿½ ï¿½ï¿½ï¿½Ô´Ï´ï¿½! (ï¿½ï¿½ï¿½ï¿½)");
 
-                // ¡Ú [Ãß°¡] ½ÃÀÛÇÏÀÚ¸¶ÀÚ ºÎ¼­Áö´Â ¼Ò¸®
+                // ï¿½ï¿½ [ï¿½ß°ï¿½] ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½ï¿½ ï¿½Î¼ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ò¸ï¿½
                 if (AudioManager.Instance != null) AudioManager.Instance.PlaySFX(sfxBreak);
 
                 ResetAllTiles();
@@ -101,16 +102,16 @@ public class PuzzleGameManager : MonoBehaviour
             ApplyGravity();
         }
 
-        // ¡Ú [Ãß°¡] ÆÛÁñ ¾À BGM Àç»ý
+        // ï¿½ï¿½ [ï¿½ß°ï¿½] ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ BGM ï¿½ï¿½ï¿½
         if (AudioManager.Instance != null)
         {
-            AudioManager.Instance.PlayBGM(puzzleBGM, 0.8f); // º¼·ý 0.8
+            AudioManager.Instance.PlayBGM(puzzleBGM, 0.8f); // ï¿½ï¿½ï¿½ï¿½ 0.8
         }
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (IsPrimaryClickPressed())
         {
             HandleInput();
         }
@@ -122,11 +123,11 @@ public class PuzzleGameManager : MonoBehaviour
     }
 
     // =========================================================
-    // 1. ÀÔ·Â Ã³¸®
+    // 1. ï¿½Ô·ï¿½ Ã³ï¿½ï¿½
     // =========================================================
     void HandleInput()
     {
-        Vector2 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector2 mousePos = Camera.main.ScreenToWorldPoint(GetPointerPosition());
         RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
 
         if (hit.collider != null)
@@ -164,13 +165,13 @@ public class PuzzleGameManager : MonoBehaviour
                 {
                     if (clickedTile.connectedTile != null)
                     {
-                        Debug.Log("»¡°£ Å¸ÀÏÀ» ´­·¯ ¿¬°áÀ» ÇØÁ¦ÇÕ´Ï´Ù.");
+                        Debug.Log("ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½.");
                         BreakConnection(clickedTile);
                         DeselectTile();
                     }
                     else
                     {
-                        Debug.Log("»¡°£ Å¸ÀÏÀº Á÷Á¢ ¿òÁ÷ÀÏ ¼ö ¾ø½À´Ï´Ù.");
+                        Debug.Log("ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
                         DeselectTile();
                     }
                     return;
@@ -180,7 +181,7 @@ public class PuzzleGameManager : MonoBehaviour
                 {
                     if (currentState == TimeState.Morning)
                     {
-                        Debug.Log("¾ÆÄ§: ¹° Å¸ÀÏÀº °íÁ¤µÇ¾î ¿òÁ÷ÀÏ ¼ö ¾ø½À´Ï´Ù.");
+                        Debug.Log("ï¿½ï¿½Ä§: ï¿½ï¿½ Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
                         DeselectTile();
                         return;
                     }
@@ -202,7 +203,7 @@ public class PuzzleGameManager : MonoBehaviour
     }
 
     // =========================================================
-    // 2. ¼±ÅÃ ¹× ÇÏÀÌ¶óÀÌÆ®
+    // 2. ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½Ì¶ï¿½ï¿½ï¿½Æ®
     // =========================================================
     void SelectGroupTiles(TileBlock iceTile)
     {
@@ -223,7 +224,7 @@ public class PuzzleGameManager : MonoBehaviour
             int redTx = redTile.x + dir.x;
             int redTy = redTile.y + dir.y;
 
-            // Å»Ãâ±¸ ¿¹¿Ü Ã³¸®
+            // Å»ï¿½â±¸ ï¿½ï¿½ï¿½ï¿½ Ã³ï¿½ï¿½
             bool isIceBoundOK = IsValidCoord(iceTx, iceTy);
             bool isRedBoundOK = IsValidCoord(redTx, redTy) || (redTx == exitPos.x && redTy == exitPos.y);
 
@@ -292,7 +293,7 @@ public class PuzzleGameManager : MonoBehaviour
     }
 
     // =========================================================
-    // 3. ÀÌµ¿ ¹× ¿¬°á ½ÇÇà
+    // 3. ï¿½Ìµï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     // =========================================================
     void ProcessMove(TileBlock tile, Vector3 targetPos)
     {
@@ -326,7 +327,7 @@ public class PuzzleGameManager : MonoBehaviour
         tile.y = newY;
         tile.SetTargetPosition(targetPos);
 
-        // Slide ¼Ò¸® Àç»ý
+        // Slide ï¿½Ò¸ï¿½ ï¿½ï¿½ï¿½
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySFX(sfxSlide);
 
         if (tile.type == TileType.Red)
@@ -335,29 +336,29 @@ public class PuzzleGameManager : MonoBehaviour
 
             if (newX == exitPos.x && newY == exitPos.y)
             {
-                Debug.Log(">> ÃàÇÏÇÕ´Ï´Ù! ÆÛÁñ Å¬¸®¾î! (¸ÞÀÎÀ¸·Î ÀÌµ¿)");
+                Debug.Log(">> ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½! ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½! (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½)");
 
-                // ¡Ú [Ãß°¡] GlobalManager¿¡ Å¬¸®¾î Á¤º¸ Àü´Þ
+                // ï¿½ï¿½ [ï¿½ß°ï¿½] GlobalManagerï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                 if (GlobalGameManager.Instance != null)
                     GlobalGameManager.Instance.SetPuzzleClear();
 
-                // ¡Ú [Ãß°¡] Å¬¸®¾î È¿°úÀ½ ¹× Á¤º¸ ÀúÀå
+                // ï¿½ï¿½ [ï¿½ß°ï¿½] Å¬ï¿½ï¿½ï¿½ï¿½ È¿ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                 if (AudioManager.Instance != null) AudioManager.Instance.PlaySFX(sfxClear);
                 if (GlobalGameManager.Instance != null) GlobalGameManager.Instance.SetPuzzleClear();
 
-                // ¡Ú [¼öÁ¤] ÆäÀÌµå ¾Æ¿ô°ú ÇÔ²² ¾À ÀÌµ¿
+                // ï¿½ï¿½ [ï¿½ï¿½ï¿½ï¿½] ï¿½ï¿½ï¿½Ìµï¿½ ï¿½Æ¿ï¿½ï¿½ï¿½ ï¿½Ô²ï¿½ ï¿½ï¿½ ï¿½Ìµï¿½
                 StartCoroutine(ReturnToMainRoutine());
             }
         }
 
-        // ÀÌµ¿ Á÷ÈÄ¿¡´Â 0.15ÃÊ µÚ Áß·Â Ã¼Å© (Æò¼Ò)
+        // ï¿½Ìµï¿½ ï¿½ï¿½ï¿½Ä¿ï¿½ï¿½ï¿½ 0.15ï¿½ï¿½ ï¿½ï¿½ ï¿½ß·ï¿½ Ã¼Å© (ï¿½ï¿½ï¿½)
         Invoke("ApplyGravity", 0.15f);
     }
 
-    // ¡Ú [ÇÙ½É] ¿¬°á ½Ã Áß·Â ÇØÁ¦ ¹× Ãë¼Ò
+    // ï¿½ï¿½ [ï¿½Ù½ï¿½] ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ß·ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½
     void ConnectTiles(TileBlock ice, TileBlock red)
     {
-        // 1. È¤½Ã »¡°£ Å¸ÀÏÀÌ ¶³¾îÁö·Á°í ´ë±â ÁßÀÌ¾ú´Ù¸é Ãë¼Ò!
+        // 1. È¤ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì¾ï¿½ï¿½Ù¸ï¿½ ï¿½ï¿½ï¿½!
         CancelInvoke("ApplyGravity");
 
         ice.SetConnection(red);
@@ -378,13 +379,13 @@ public class PuzzleGameManager : MonoBehaviour
             red.connectionVisualRef = visual;
         }
 
-        // ¡Ú [Ãß°¡] ¿¬°á È¿°úÀ½ Àç»ý
+        // ï¿½ï¿½ [ï¿½ß°ï¿½] ï¿½ï¿½ï¿½ï¿½ È¿ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         if (AudioManager.Instance != null) AudioManager.Instance.PlaySFX(sfxConnect);
 
-        Debug.Log("¾óÀ½°ú »¡°£ Å¸ÀÏ ¿¬°á! (Áß·Â ¹«½Ã »óÅÂ)");
+        Debug.Log("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½! (ï¿½ß·ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)");
     }
 
-    // ¡Ú [ÇÙ½É] ¿¬°á ÇØÁ¦ ½Ã 3ÃÊ µô·¹ÀÌ Áß·Â
+    // ï¿½ï¿½ [ï¿½Ù½ï¿½] ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ 3ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ß·ï¿½
     void BreakConnection(TileBlock tile)
     {
         if (tile.connectionVisualRef != null) Destroy(tile.connectionVisualRef);
@@ -396,15 +397,15 @@ public class PuzzleGameManager : MonoBehaviour
             tile.connectedTile.SetConnection(null);
             tile.SetConnection(null);
 
-            Debug.Log("¿¬°á ÇØÁ¦µÊ. 3ÃÊ µÚ »¡°£ Å¸ÀÏÀÌ ¶³¾îÁý´Ï´Ù.");
+            Debug.Log("ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½. 3ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
 
-            // ¡Ú ¿¬°áÀÌ ²÷¾îÁ³À¸¹Ç·Î 3ÃÊ µÚ¿¡ Áß·Â ÇÔ¼ö È£Ãâ ¿¹¾à!
+            // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ 3ï¿½ï¿½ ï¿½Ú¿ï¿½ ï¿½ß·ï¿½ ï¿½Ô¼ï¿½ È£ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½!
             Invoke("ApplyGravity", 3.0f);
         }
     }
 
     // =========================================================
-    // 4. Áß·Â
+    // 4. ï¿½ß·ï¿½
     // =========================================================
     void ApplyGravity()
     {
@@ -413,7 +414,7 @@ public class PuzzleGameManager : MonoBehaviour
 
         foreach (var tile in redTiles)
         {
-            // ¿¬°áµÈ »óÅÂ¸é Áß·Â ¹«½Ã
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Â¸ï¿½ ï¿½ß·ï¿½ ï¿½ï¿½ï¿½ï¿½
             if (tile.connectedTile != null) continue;
 
             while (true)
@@ -440,29 +441,29 @@ public class PuzzleGameManager : MonoBehaviour
                 tile.SetTargetPosition(destPos);
                 GlobalGameManager.Instance.savedRedTilePos = new Vector2Int(tile.x, tile.y);
 
-                // ¶³¾îÁö°í ³ª¼­ È¤½Ã Å»Ãâ±¸ÀÎÁö Ã¼Å© (µå¹® °æ¿ìÁö¸¸ ¾ÈÀüÀåÄ¡)
+                // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È¤ï¿½ï¿½ Å»ï¿½â±¸ï¿½ï¿½ï¿½ï¿½ Ã¼Å© (ï¿½å¹® ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¡)
                 if (tile.x == exitPos.x && tile.y == exitPos.y)
                 {
-                    Debug.Log(">> ³«ÇÏÇÏ¿© Å»Ãâ±¸ µµ´Þ! Å¬¸®¾î!");
+                    Debug.Log(">> ï¿½ï¿½ï¿½ï¿½ï¿½Ï¿ï¿½ Å»ï¿½â±¸ ï¿½ï¿½ï¿½ï¿½! Å¬ï¿½ï¿½ï¿½ï¿½!");
 
-                    // ¡Ú [Ãß°¡] GlobalManager¿¡ Å¬¸®¾î Á¤º¸ Àü´Þ
+                    // ï¿½ï¿½ [ï¿½ß°ï¿½] GlobalManagerï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                     if (GlobalGameManager.Instance != null)
                         GlobalGameManager.Instance.SetPuzzleClear();
 
-                    // ¡Ú [Ãß°¡] Å¬¸®¾î È¿°úÀ½ ¹× Á¤º¸ ÀúÀå
+                    // ï¿½ï¿½ [ï¿½ß°ï¿½] Å¬ï¿½ï¿½ï¿½ï¿½ È¿ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                     if (AudioManager.Instance != null) AudioManager.Instance.PlaySFX(sfxClear);
                     if (GlobalGameManager.Instance != null) GlobalGameManager.Instance.SetPuzzleClear();
 
-                    // ¡Ú [¼öÁ¤] ÆäÀÌµå ¾Æ¿ô°ú ÇÔ²² ¾À ÀÌµ¿
+                    // ï¿½ï¿½ [ï¿½ï¿½ï¿½ï¿½] ï¿½ï¿½ï¿½Ìµï¿½ ï¿½Æ¿ï¿½ï¿½ï¿½ ï¿½Ô²ï¿½ ï¿½ï¿½ ï¿½Ìµï¿½
                     StartCoroutine(ReturnToMainRoutine());
                 }
             }
         }
-        if (hasMoved) Debug.Log(">> Áß·Â ÀÛ¿ë: »¡°£ Å¸ÀÏ ³«ÇÏ.");
+        if (hasMoved) Debug.Log(">> ï¿½ß·ï¿½ ï¿½Û¿ï¿½: ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½.");
     }
 
     // =========================================================
-    // 5. À¯Æ¿¸®Æ¼ ¹× ÃÊ±âÈ­
+    // 5. ï¿½ï¿½Æ¿ï¿½ï¿½Æ¼ ï¿½ï¿½ ï¿½Ê±ï¿½È­
     // =========================================================
     void InitializeCoordinates()
     {
@@ -509,41 +510,41 @@ public class PuzzleGameManager : MonoBehaviour
         return tiles.Any(t => t != r && t.type == TileType.Water && t.x == r.x && t.y == r.y);
     }
 
-    // ¡Ú ¹öÆ°¿¡ ¿¬°áÇÒ ÇÔ¼ö (Public ÇÊ¼ö)
+    // ï¿½ï¿½ ï¿½ï¿½Æ°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ (Public ï¿½Ê¼ï¿½)
     public void ResetAllTiles()
     {
-        // 1. ¸ðµç Å¸ÀÏÀ» ÃÊ±â »óÅÂ·Î µÇµ¹¸®±â
+        // 1. ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½ ï¿½ï¿½ï¿½Â·ï¿½ ï¿½Çµï¿½ï¿½ï¿½ï¿½ï¿½
         foreach (var tile in tiles)
         {
-            // ³í¸® ÁÂÇ¥ º¹±¸
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç¥ ï¿½ï¿½ï¿½ï¿½
             tile.x = tile.initialX;
             tile.y = tile.initialY;
 
-            // ¿¬°á »óÅÂ ÇØÁ¦ (Áß¿ä: ºñÁÖ¾óµµ »èÁ¦ÇØ¾ß ÇÔ)
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ß¿ï¿½: ï¿½ï¿½ï¿½Ö¾ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ø¾ï¿½ ï¿½ï¿½)
             tile.SetConnection(null);
             if (tile.connectionVisualRef != null) Destroy(tile.connectionVisualRef);
 
-            // ¿ùµå À§Ä¡ Áï½Ã ÀÌµ¿ (Teleport)
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ (Teleport)
             Vector3 pos = GetWorldPosFromGrid(tile.x, tile.y);
 
-            // »¡°£ Å¸ÀÏÀº ¾ÕÀ¸·Î, ³ª¸ÓÁö´Â µÚ·Î
+            // ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ú·ï¿½
             pos.z = (tile.type == TileType.Red) ? -2f : 0f;
 
             tile.TeleportTo(tile.x, tile.y, pos);
         }
 
-        // 2. ¡Ú [ÇÙ½É] ÀúÀåµÈ À§Ä¡ Á¤º¸ »èÁ¦ (ÀÌ°Ô ¾øÀ¸¸é ¾À Àç½ÃÀÛ ½Ã ¶Ç ÀÌ»óÇÑ °÷À¸·Î °¨)
+        // 2. ï¿½ï¿½ [ï¿½Ù½ï¿½] ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½Ì°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½Ì»ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½)
         if (GlobalGameManager.Instance != null)
         {
             GlobalGameManager.Instance.savedRedTilePos = null;
-            Debug.Log(">>> ¸®¼Â ¹öÆ°: ÀúÀåµÈ »¡°£ Å¸ÀÏ À§Ä¡¸¦ ÃÊ±âÈ­Çß½À´Ï´Ù.");
+            Debug.Log(">>> ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ°: ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½Ê±ï¿½È­ï¿½ß½ï¿½ï¿½Ï´ï¿½.");
         }
 
-        Debug.Log("¸ðµç Å¸ÀÏÀÌ ÃÊ±â À§Ä¡·Î ¸®¼ÂµÇ¾ú½À´Ï´Ù.");
+        Debug.Log("ï¿½ï¿½ï¿½ Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½ÂµÇ¾ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.");
 
-        // 3. ¡Ú [ÇÙ½É] Áß·Â ÀçÀû¿ë
-        // ÃÊ±â À§Ä¡·Î µ¹¾Æ°£ »óÅÂ¿¡¼­, ¸¸¾à °øÁßÀÌ¶ó¸é(±×¸®°í ³· ½Ã°£´ë¶ó¸é) ´Ù½Ã ¶³¾îÁ®¾ß ÇÔ.
-        // Áï½Ã ½ÇÇàÇÏ¸é À§Ä¡ °»½Å Ãæµ¹ÀÌ ³¯ ¼ö ÀÖÀ¸¹Ç·Î ¾ÆÁÖ ÂªÀº µô·¹ÀÌ ÈÄ ½ÇÇà
+        // 3. ï¿½ï¿½ [ï¿½Ù½ï¿½] ï¿½ß·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        // ï¿½Ê±ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ï¿½Æ°ï¿½ ï¿½ï¿½ï¿½Â¿ï¿½ï¿½ï¿½, ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ì¶ï¿½ï¿½(ï¿½×¸ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½Ã°ï¿½ï¿½ï¿½ï¿½ï¿½) ï¿½Ù½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½.
+        // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ ï¿½æµ¹ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç·ï¿½ ï¿½ï¿½ï¿½ï¿½ Âªï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         Invoke("ApplyGravity", 0.1f);
     }
 
@@ -568,6 +569,7 @@ public class PuzzleGameManager : MonoBehaviour
 
     IEnumerator ReturnToMainRoutine()
     {
+        SyncTimeBackToMain();
         ScreenFadeController fadeController = ScreenFadeController.Instance;
         if (fadeController != null)
         {
@@ -576,12 +578,12 @@ public class PuzzleGameManager : MonoBehaviour
                 StartCoroutine(AudioManager.Instance.FadeOutBGM(1.0f));
             }
 
-            // VR ·Îµù °¡¸²À» À§ÇØ ¸ÕÀú ÆäÀÌµå ÈÄ ¾À ÀüÈ¯
+            // VR ï¿½Îµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ìµï¿½ ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½È¯
             fadeController.PlaySceneTransition(returnSceneName, LoadSceneMode.Single, exitFadeDuration);
             yield break;
         }
 
-        // 1. ¼Ò¸® ÆäÀÌµå ¾Æ¿ô (1ÃÊ µ¿¾È)
+        // 1. ï¿½Ò¸ï¿½ ï¿½ï¿½ï¿½Ìµï¿½ ï¿½Æ¿ï¿½ (1ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
         if (AudioManager.Instance != null)
         {
             yield return StartCoroutine(AudioManager.Instance.FadeOutBGM(1.0f));
@@ -591,7 +593,48 @@ public class PuzzleGameManager : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
         }
 
-        // 2. ¾À ÀÌµ¿
+        // 2. ï¿½ï¿½ ï¿½Ìµï¿½
         SceneManager.LoadScene(returnSceneName);
+    }
+
+    private void SyncTimeBackToMain()
+    {
+        if (GlobalGameManager.Instance == null)
+        {
+            return;
+        }
+
+        switch (GlobalGameManager.Instance.currentTimeState)
+        {
+            case TimeState.Evening:
+                SceneReturnState.StoreReturnTime(TimeSlot.T2);
+                break;
+            case TimeState.Night:
+                SceneReturnState.StoreReturnTime(TimeSlot.T3);
+                break;
+            default:
+                SceneReturnState.StoreReturnTime(TimeSlot.T1);
+                break;
+        }
+    }
+
+    private static bool IsPrimaryClickPressed()
+    {
+        if (Mouse.current != null)
+        {
+            return Mouse.current.leftButton.wasPressedThisFrame;
+        }
+
+        return Input.GetMouseButtonDown(0);
+    }
+
+    private static Vector2 GetPointerPosition()
+    {
+        if (Mouse.current != null)
+        {
+            return Mouse.current.position.ReadValue();
+        }
+
+        return Input.mousePosition;
     }
 }

@@ -1176,6 +1176,7 @@ GameObject:
   m_Component:
   - component: {fileID: 549666981}
   - component: {fileID: 549666980}
+  - component: {fileID: 910000800}
   m_Layer: 0
   m_Name: EventManager
   m_TagString: Untagged
@@ -3429,3 +3430,27 @@ SceneRoots:
   - {fileID: 266503279}
   - {fileID: 2011386296}
   - {fileID: 910512654}
+--- !u!114 &910000800
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 549666979}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c1d2e3f4a5b69788c0d1e2f3a4b5c6d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Scene1StartSequence
+  speakerName: ""
+  storyLines:
+  - "여긴 어디지.."
+  - "잠깐.. 여기는 내 방이잖아?"
+  - "어떤게 된거지.."
+  - "기억이 나질 않아.."
+  - "주위를 둘러보며 탐색해보자."
+  blinkCount: 4
+  blinkInterval: 0.2
+  hideOverlayAfter: 1
+  overlaySortingOrder: 20000
+  playOnce: 1
